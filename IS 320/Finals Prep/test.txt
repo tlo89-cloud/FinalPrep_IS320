@@ -1,0 +1,7 @@
+Alex,10,Hourly,150.00
+Ben,20,Salaried,500.00
+Cathy,10,Salaried,250.00
+Denise,30,Hourly,450.00
+Emily,50,Salaried,1250.00
+Frank,40,Hourly,600.00
+Ben,20,Hourly,300.00

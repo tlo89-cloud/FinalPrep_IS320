@@ -1,0 +1,5 @@
+Alex,100000,WA
+Ben,200000,WA
+Cathy,10000,OR
+Denise,300000,NY
+Emily,150000,CA
