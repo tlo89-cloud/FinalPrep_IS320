@@ -1,4 +1,0 @@
-Adam 90
-Ben 81
-Cathy 40
-James 50

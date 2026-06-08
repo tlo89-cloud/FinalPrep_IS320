@@ -1,4 +1,0 @@
-Alice,50,1
-Bob,200,0
-Cathy,75,1
-Dave,100,1
