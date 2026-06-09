@@ -154,17 +154,118 @@ def display_orders():
     print(line)
 
 
-# main
-# quit = False
-while True:
-    print('1.Submit Order 2.Display Orders 3.Exit')
-    choice = int(input('Enter 1,2, or 3 >> '))
-    if choice == 1:
-        submit_order()
-    elif choice == 2:
-        display_orders()
-    elif choice == 3:
-        break   # will be used for logout in stage 2
-    else:
-        print('Invalid choice!')
+
+
+def edit_prices():
+    pass
+
+def reorder_stock():
+    pass
+
+
+
+def manager_menu_valid_choice(choice):
+    return 1 <= choice <= 5
+    
+def manager_menu(): 
+    global  quit_program
+
+    ''' Displays and Handles the manger menu'''
+    while True:
+        print('1. Display Orders    2.Edit Prices   3.Reorder Stock     4.Logout    5.Quit')
+        while True:
+            try:
+                choice = int(input('Enter 1, 2, 3, 4, or 5 >>'))
+                assert manager_menu_valid_choice(choice)
+                break
+            except ValueError:
+                print('Choice must be a number')
+            except AssertionError:
+                print('Choice must be between 1 and 5 >>')
+
+        if choice == 1:
+            display_orders()
+        elif choice == 2:
+            edit_prices()
+        elif choice == 3:
+            reorder_stock()
+        elif choice == 4:
+            print('Logged out.')
+            return 'logout'
+        elif choice == 5:
+            quit_program = True
+            return
+
+
+
+def customer_menu_valid_choice(choice):
+    return 1 <= choice <= 4
+
+def customer_menu():
+    global quit_program
+
+    ''' Displays and handles the customer menu'''
+    while True:
+        print('1.Submit Order   2.Display Orders    3.Logout    4.Exit')
+        while True:
+            try:
+                choice = int(input('1 2 or 3 >>'))
+                assert customer_menu_valid_choice(choice)
+                break
+            except ValueError:
+                print('Choice must be a number')
+            except AssertionError:
+                print('Choice must be between 1 and 4')
+
+        if choice == 1:
+            submit_order()
+        elif choice == 2:
+            display_orders()  
+        elif choice == 3:
+            print('Logged out.')
+            return 'logout'
+        elif choice == 4:
+            quit_program = True
+            return
+
+
+
+
+        
+
+# --- Main --- #
+
+quit_program = False
+while not quit_program:
+    print('1.Login  2.Quit')
+    c1 = int(input('Choose 1 or 2 >>'))
+    if c1 == 2:
+        break
+
+    # login returns who logged in
+    user, userID = login()
+
+    if user == 'customer':
+        result = customer_menu()
+    elif user == 'manager':
+        result = manager_menu()
+
+
 print('Goodbye!')
+
+
+
+# # main
+# # quit = False
+# while True:
+#     print('1.Submit Order 2.Display Orders 3.Exit')
+#     choice = int(input('Enter 1,2, or 3 >> '))
+#     if choice == 1:
+#         submit_order()
+#     elif choice == 2:
+#         display_orders()
+#     elif choice == 3:
+#         break   # will be used for logout in stage 2
+#     else:
+#         print('Invalid choice!')
+# print('Goodbye!')
