@@ -10,6 +10,9 @@ import random
 # globals / dict. initalization
 user = None
 userID = None
+customer = False
+manager = False
+quit_program = False
 
 # Already filled, make at least three products with
 # Attributes of products: id, name, unit price, stock (quantity available)
@@ -31,31 +34,71 @@ customers = {101:{'name':'John', 'password':'johncustomer'},
             102:{'name':'Jane', 'password':'janecustomer'}}
 manager = {201:{'name':'Bob', 'password':'bobmanager'}}
 
+
 # functions
+
+def def_correct_user_type(user_type):
+    return 1 <= user_type <= 2
+
+
 def login():
-    global customers, manager, user, userID
+    global customer, manager, user, userID
+    
+    # --- Figure out user type --- #
     while True:
         try:
-            userID = int(input('To login, enter your userID here >>'))
+            user_type  = int(input('Choose 1 for customer, 2 for manager >\n1 OR 2 >> '))
+            assert def_correct_user_type(user_type)
+            break
         except ValueError:
-            print('userID must be a number')
+            print('Choice must be a number')
+        except AssertionError:
+            print('Please choose 1 or 2')
+
+        
+
+        # --- Asking for User ID --- # (based on which type of user)
+        
+        if user_type == 1:
+            user_dictionary = customers
+            user = 'customer'
         else:
-            if userID in customers:
-                user = 'customer'
-                user_dictionary = customers
-            elif userID in manager:
-                user = 'manager'
-                user_dictionary = manager
+            user_type = manager
+            user = 'manager'
+        
+        while True:
+            try:
+                userID = int(input('Enter id > '))
+                assert userID in user_dictionary
+                break
+            except ValueError:
+                print('Invalid Login!')
+            except AssertionError:
+                print('Invalid Login!')
+
+        # --- Ask for Passwrod --- # 
+        # make sure password is in dictionary 
+
+        while True:
+            password = input('Password > ')
+            if password == user_dictionary[userID]['password']:
+                if user == 'customer':
+                    customer = True
+                    manager = False
+                    print(f'Welcome Customer {userID:d}!')
+                else:
+                    customer = False
+                    manager = True
+                    print(f'Welcome Manager {userID:d}')
+                    break
             else:
-                print('ID not found, please try again.')
-            if user:
-                password = input('Please enter your password here >>')
-                if password == user_dictionary[userID]['password']:
-                    print(f'Login successful, welcome, {user_dictionary[userID]["name"]}!')
-                    return user, userID
-                else: 
-                    print('Incorrect password, try again')
-                    user = None
+                print('Incorrect password!')
+#end login
+
+        
+
+        
+
                
 def display_products():
     '''Displays all available products with ID, name, and unit price
@@ -315,8 +358,9 @@ def customer_menu_valid_choice(choice):
 
 def customer_menu():
     global quit_program
-
+    
     ''' Displays and handles the customer menu'''
+
     while True:
         print('1.Submit Order   2.Display Orders    3.Logout    4.Exit')
         while True:
@@ -350,16 +394,14 @@ quit_program = False
 while not quit_program:
     print('1.Login  2.Quit')
     c1 = int(input('Choose 1 or 2 >>'))
-    if c1 == 2:
+    if c1 == 1:
+        login()
+
+        if customer:
+            customer_menu()
+        elif manager:
+            manager_menu()
+    elif c1 == 2:
         break
-
-    # login returns who logged in
-    user, userID = login()
-
-    if user == 'customer':
-        customer_menu()
-    elif user == 'manager':
-        manager_menu()
-
 
 print('Goodbye!')
