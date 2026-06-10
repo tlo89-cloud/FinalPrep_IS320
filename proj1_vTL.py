@@ -1,5 +1,5 @@
-'''GROUP PROJECT SOMETHING (i forgot our number)
-Team members: Henry, Hayley, Trevor, and mystery man
+'''IS320 PROJECT GROUP 4 
+Team members: 
 
 Project Stage: 1
 Status: Complete
@@ -8,6 +8,8 @@ import datetime
 import random
 
 # globals / dict. initalization
+user = None
+userID = None
 
 # Already filled, make at least three products with
 # Attributes of products: id, name, unit price, stock (quantity available)
@@ -24,8 +26,37 @@ products = {1001: {'name': 'Volleyball', 'unit_price': 15.00, 'stock': 500, 'in_
 order_id = 1000
 orders = {}
 
+# customer and manager dictionaries for login
+customers = {101:{'name':'John', 'password':'johncustomer'},
+            102:{'name':'Jane', 'password':'janecustomer'}}
+manager = {201:{'name':'Bob', 'password':'bobmanager'}}
 
 # functions
+def login():
+    global customers, manager, user, userID
+    while True:
+        try:
+            userID = int(input('To login, enter your userID here >>'))
+        except ValueError:
+            print('userID must be a number')
+        else:
+            if userID in customers:
+                user = 'customer'
+                user_dictionary = customers
+            elif userID in manager:
+                user = 'manager'
+                user_dictionary = manager
+            else:
+                print('ID not found, please try again.')
+            if user:
+                password = input('Please enter your password here >>')
+                if password == user_dictionary[userID]['password']:
+                    print(f'Login successful, welcome, {user_dictionary[userID]["name"]}!')
+                    return user, userID
+                else: 
+                    print('Incorrect password, try again')
+                    user = None
+               
 def display_products():
     '''Displays all available products with ID, name, and unit price
     '''
@@ -79,6 +110,12 @@ def product_id_list():
         prod_id_list.append(pid)   # check with manoj append is ok to use
     return prod_id_list
 
+def reduce_stock(pid, qty):
+    '''Reduces stock when an order is placed, and updates in_stock if the item runs out'''
+    product = products[pid]
+    product['stock']-= qty
+    if product['stock'] == 0:
+        product['in_stock'] = False
 
 def submit_order():
     '''Handles full order submission including product selection, quantity,
@@ -86,20 +123,12 @@ def submit_order():
     '''
     global products, order_id, orders
     display_products()
-    print('1. Volleyball 2. Softball 3. Basketball 4. Football 5. Baseball')
-    while True:
-        try:
-            num_choice = int(input('Choose 1, 2, 3, 4, or 5 for the product '))
-            assert 1 <= num_choice <= 5
-            break
-        except ValueError:
-            print('Product choice must be a number')
-        except AssertionError:
-            print('Product choice must be between 1 and 5')
-
-    pid_list = product_id_list()
-    selected_pid = pid_list[num_choice - 1]     # let me know if we find a simpler way to do this
+    selected_pid = choose_product()
     product_details = products[selected_pid]
+
+    if not product_details['in_stock']:
+        print('Sorry, the selected item is out of stock.')
+        return
 
     while True:
         try:
@@ -117,7 +146,7 @@ def submit_order():
 
     order_date = get_date(datetime.date(2021, 1, 1), datetime.date(2023, 12, 31))
     order_id += 1
-    customer_id = 101   # hardcode to be updated in pt 2
+    customer_id = userID   # hardcode to be updated in pt 2
     order_dict = {
         'order_date': order_date,
         'customer_id': customer_id,
@@ -127,11 +156,36 @@ def submit_order():
         'order_price': order_price
                 }
     orders[order_id] = order_dict
+    reduce_stock(selected_pid, qty_ordered)
     print_order_details(order_id, order_dict)
 
 
+def customer_display_orders():
+    '''Displays all orders for the current customer, order date is stored in the dictionary as a date
+    '''
+    if not orders:
+        print('No orders to display')
+        return
+
+    width = 80
+    line = '-' * width
+    print(line)
+    print(f'|{"OrderID":^10s}|{"Date":^10s}|{"Product ID":^12s}|{"Name":^10s}|{"Quantity":^10s}|{"Price":^10s}|')
+    print(line)
+    for oid in orders:
+        order_details = orders[oid]
+        if order_details['customer_id'] != userID:
+            continue
+        date_string = order_details['order_date'].strftime("%d-%m-%y")
+        prod_id = order_details['product_id']
+        name = order_details['product_name']
+        quantity = order_details["quantity"]
+        price = order_details["order_price"]
+        print(f'|{oid:<10d}|{date_string:^10s}|{prod_id:^12d}|{name:^10s}|{quantity:^10d}|{price:^10.2f}|')
+    print(line)
+
 def display_orders():
-    '''Displays all orders, order date is stored in the dictrionary as a date
+    '''Displays all orders, order date is stored in the dictionary as a date
     '''
     if not orders:
         print('No orders to display')
@@ -153,20 +207,78 @@ def display_orders():
         print(f'|{oid:<10d}|{customer_id:^10d}|{date_string:^10s}|{prod_id:^12d}|{name:^10s}|{quantity:^10d}|{price:^10.2f}|')
     print(line)
 
-
+def manager_display_products():
+    print(f'{"ID":<10s}{"Name":<15s}{"Stock":<10s}')
+    for pid in products:
+        product_details = products[pid]
+        if not product_details['in_stock']:
+            continue
+        name = product_details["name"]
+        stock = product_details["stock"]
+        print(f'{pid:<10d}{name:<15s}{stock:<10d}')
 
 
 def edit_prices():
-    pass
+    global products
+    manager_display_products()
+    selected_pid = choose_product()
+    product_details = products[selected_pid]
+    name = product_details['name']
+    current_price = product_details['unit_price']
+    print(f'The current price of {name:s} is ${current_price:.2f}.')
+    while True:
+        try:
+            new_price = float(input('Enter the new price >>'))
+            assert new_price > 0
+            break
+        except ValueError:
+            print('Price must be a number')
+        except AssertionError:
+            print('Price must be greater than 0')
 
+    product_details['unit_price'] = new_price
+    print(f'The price of {name:s} has been updated to ${new_price:.2f}.')
+def choose_product():
+    global products
+    print('1. Volleyball 2. Softball 3. Basketball 4. Football 5. Baseball')
+    while True:
+        try:
+            num_choice = int(input('Choose 1, 2, 3, 4, or 5 for the product >>'))
+            assert 1 <= num_choice <= 5
+            break
+        except ValueError:
+            print('Product choice must be a number')
+        except AssertionError:
+            print('Product choice must be between 1 and 5')
+
+    pid_list = product_id_list()
+    selected_pid = pid_list[num_choice - 1]
+    return selected_pid
 def reorder_stock():
-    pass
+    global products
+    selected_pid = choose_product()
+    product_details = products[selected_pid]
+    name = product_details['name']
+    print(f'How many {name:s}s would you like to order?')
+    while True:
+        try:
+            qty_ordered = int(input('Enter quantity ordered >> '))
+            assert qty_ordered > 0
+            break
+        except ValueError:
+            print('Quantity must be a number')
+        except AssertionError:
+            print(f"Quantity must be greater than 0")
+    product_details['stock'] += qty_ordered
+    if product_details['stock'] > 0:
+        product_details['in_stock'] = True
+    print(f'{qty_ordered:d} {name:s}(s) added to stock. Current stock: {product_details["stock"]:d}')
 
 
 
 def manager_menu_valid_choice(choice):
     return 1 <= choice <= 5
-    
+
 def manager_menu(): 
     global  quit_program
 
@@ -191,7 +303,7 @@ def manager_menu():
             reorder_stock()
         elif choice == 4:
             print('Logged out.')
-            return 'logout'
+            return
         elif choice == 5:
             quit_program = True
             return
@@ -220,10 +332,9 @@ def customer_menu():
         if choice == 1:
             submit_order()
         elif choice == 2:
-            display_orders()  
+            customer_display_orders()  
         elif choice == 3:
-            print('Logged out.')
-            return 'logout'
+            return
         elif choice == 4:
             quit_program = True
             return
@@ -246,26 +357,9 @@ while not quit_program:
     user, userID = login()
 
     if user == 'customer':
-        result = customer_menu()
+        customer_menu()
     elif user == 'manager':
-        result = manager_menu()
+        manager_menu()
 
 
 print('Goodbye!')
-
-
-
-# # main
-# # quit = False
-# while True:
-#     print('1.Submit Order 2.Display Orders 3.Exit')
-#     choice = int(input('Enter 1,2, or 3 >> '))
-#     if choice == 1:
-#         submit_order()
-#     elif choice == 2:
-#         display_orders()
-#     elif choice == 3:
-#         break   # will be used for logout in stage 2
-#     else:
-#         print('Invalid choice!')
-# print('Goodbye!')
