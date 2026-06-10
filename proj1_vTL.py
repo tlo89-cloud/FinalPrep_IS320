@@ -32,7 +32,7 @@ orders = {}
 # customer and manager dictionaries for login
 customers = {101:{'name':'John', 'password':'johncustomer'},
             102:{'name':'Jane', 'password':'janecustomer'}}
-manager = {201:{'name':'Bob', 'password':'bobmanager'}}
+managers = {201:{'name':'Bob', 'password':'bobmanager'}}
 
 
 # functions
@@ -59,40 +59,40 @@ def login():
 
         # --- Asking for User ID --- # (based on which type of user)
         
-        if user_type == 1:
-            user_dictionary = customers
-            user = 'customer'
-        else:
-            user_type = manager
-            user = 'manager'
+    if user_type == 1:
+        user_dictionary = customers
+        user = 'customer'
+    else:
+        user_dictionary = managers
+        user = 'manager'
         
-        while True:
-            try:
-                userID = int(input('Enter id > '))
-                assert userID in user_dictionary
-                break
-            except ValueError:
-                print('Invalid Login!')
-            except AssertionError:
-                print('Invalid Login!')
+    while True:
+        try:
+            userID = int(input('Enter id > '))
+            assert userID in user_dictionary
+            break
+        except ValueError:
+            print('Invalid Login!')
+        except AssertionError:
+            print('Invalid Login!')
 
         # --- Ask for Passwrod --- # 
         # make sure password is in dictionary 
 
-        while True:
-            password = input('Password > ')
-            if password == user_dictionary[userID]['password']:
-                if user == 'customer':
-                    customer = True
-                    manager = False
-                    print(f'Welcome Customer {userID:d}!')
-                else:
-                    customer = False
-                    manager = True
-                    print(f'Welcome Manager {userID:d}')
-                    break
+    while True:
+        password = input('Password > ')
+        if password == user_dictionary[userID]['password']:
+            if user == 'customer':
+                customer = True
+                manager = False
+                print(f'Welcome Customer {userID:d}!')
             else:
-                print('Incorrect password!')
+                customer = False
+                manager = True
+                print(f'Welcome Manager {userID:d}')
+            break
+        else:
+            print('Incorrect password!')
 #end login
 
         
@@ -358,7 +358,7 @@ def customer_menu_valid_choice(choice):
 
 def customer_menu():
     global quit_program
-    
+
     ''' Displays and handles the customer menu'''
 
     while True:
