@@ -1,8 +1,7 @@
 '''IS320 PROJECT GROUP 4
-Team members:
+Team members: Henry, Lawrence, Hayley, Trevor, Nico, Luis
 
-Project Stage: 2
-Status: Complete
+This program simulates a simple order management system for Dick's Sporting Goods. 
 '''
 import datetime
 import random
@@ -120,7 +119,6 @@ def login():
 #product display/selection
 
 def display_products():
-    '''Displays available products with ID, name, and unit price (customer view)'''
     print(f'{"ID":<10s}{"Name":<15s}{"Unit Price":<10s}')
     for pid in products:
         product = products[pid]
@@ -130,9 +128,6 @@ def display_products():
 
 
 def manager_display_products():
-    '''Displays ALL products with complete information (manager view).
-    Out-of-stock items are included -- the manager needs to see them
-    to reorder stock.'''
     print(f'{"ID":<10s}{"Name":<15s}{"Unit Price":<12s}{"Stock":<10s}')
     for pid in products:
         product = products[pid]
@@ -140,11 +135,6 @@ def manager_display_products():
 
 
 def choose_product():
-    '''Prompts the user to select a product, validating the selection.
-    Builds an explicit mapping of menu number -> product id
-    (1:1001, 2:1002, ...) from the products dictionary, so the menu and
-    the selection can never fall out of sync, and both stay correct if
-    products are ever added or changed.'''
     pid_list = list(products.keys())
     choice_map = {}
     menu_line = ''
@@ -172,7 +162,6 @@ def choose_product():
 #customer functions
 
 def submit():
-
     global order_id
 
     display_products()
@@ -250,8 +239,6 @@ def manager_display_orders():
 
 
 def edit_prices():
-    '''Manager edits unit price for an individual product. Products are
-    displayed (complete information) before and after the edit, per spec.'''
     manager_display_products()
     selected_pid = choose_product()
     product = products[selected_pid]
@@ -273,9 +260,6 @@ def edit_prices():
 
 
 def reorder_stock():
-    '''Manager chooses a product and specifies a reorder quantity, which is
-    added to the current stock. Products are displayed first so the manager
-    can see current stock levels (including items at 0).'''
     manager_display_products()
     selected_pid = choose_product()
     product = products[selected_pid]
@@ -302,7 +286,6 @@ def manager_menu_valid_choice(choice):
 
 
 def manager_menu():
-    '''Displays and handles the manager menu'''
     global quit_program
 
     while True:
@@ -336,8 +319,6 @@ def customer_menu_valid_choice(choice):
 
 
 def customer_menu():
-    '''Displays and handles the customer menu.
-    Option 3 logs out (program keeps running), Option 4 quits.'''
     global quit_program
 
     while True:
